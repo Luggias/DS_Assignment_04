@@ -14,9 +14,15 @@
 
 1. Why did message D have to be buffered and can we now always guarantee that all clients
    display the same message order?
+Message D had to be buffered because its vector timestamp showed that it depended on earlier messages that the client had not received yet. 
+D had to wait until the missing messages arrived.
+With this mechanism we can ensure that all clients show the same message order, but not necessarily a total global order. 
+Independent messages can still appear in different orders on different clients, which is normal.
 
 2. Note that the chat application uses UDP. What could be an issue with this design choice—and
    how would you fix it?
+Using UDP can cause problems because UDP does not guarantee delivery or ordering. Messages can get lost or arrive out of order, which would break delivery if an important message never arrives.
+A better solution would be to switch to TCP.
    
 ### Task 3
 
