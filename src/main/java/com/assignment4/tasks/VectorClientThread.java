@@ -51,7 +51,8 @@ public class VectorClientThread implements Runnable {
           Message message = new Message(messageBody, receivedClock, senderID);
           if (vcl.checkAcceptMessage(senderID, receivedClock)) {
               displayMessage(message);
-          }
+              checkBuffer();
+          } else{buffer.add(message);}
 
       } catch (IOException e) {
           break;
@@ -75,4 +76,34 @@ public class VectorClientThread implements Runnable {
       System.out.println("Current clock: " + vcl.showClock());
 
   }
+    private void deliver(Message message) {
+        System.out.println("Client " + message.getSenderID() + ": " +
+                message.getMessage() + ": " + message.getClock().showClock());
+
+        vcl.updateClock(message.getClock());
+
+        System.out.println("Current clock: " + vcl.showClock());
+    }
+
+
+    private void checkBuffer() {
+        boolean deliveredSomething = true;
+
+        while (deliveredSomething) {
+            deliveredSomething = false;
+
+            List<Message> delivered = new ArrayList<>();
+
+            for (Message m : buffer) {
+                if (vcl.checkAcceptMessage(m.getSenderID(), m.getClock())) {
+                    deliver(m);
+                    delivered.add(m);
+                    deliveredSomething = true;
+                }
+            }
+
+            buffer.removeAll(delivered);
+        }
+    }
+
 }

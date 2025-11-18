@@ -40,7 +40,7 @@ public class VectorClock {
   // For Task 2.2
   // Check if a message can be delivered or has to be buffered
   public synchronized boolean checkAcceptMessage(int senderId, VectorClock senderClock) {
-    if( this.timestamps[senderId]+1== senderClock.timestamps[senderId]) {
+    if( timestamps[senderId]+1== senderClock.timestamps[senderId]) {
         return true;
     }
     return false;
