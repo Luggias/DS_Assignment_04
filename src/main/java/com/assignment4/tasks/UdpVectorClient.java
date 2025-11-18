@@ -29,17 +29,20 @@ public class UdpVectorClient {
 
     // TODO: This should not be counted as a message event, so the clock should not tick
 
-    String joinMessage = "message:timestamp:id";
+      String joinMessage = "joinMessage:" + vcl.getCurrentTimestamp(id) + ":" + id;
 
     //TODO: Send an initial "join" message to notify the other clients that a new one has connected
+      byte [] sendData = joinMessage.getBytes();
 
    // TODO: Send the packet to the server
+      DatagramPacket joinPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
+      clientSocket.send(joinPacket);
 
     // Prompt the user to start entering messages
     System.out.println("[" + id + "] Enter any message:");
     Scanner input = new Scanner(System.in);
 
-    while (true) {
+    while (clientSocket.isConnected()) {
       String messageBody = input.nextLine(); // Read user input
 
       if (!messageBody.isEmpty()) {
@@ -51,11 +54,20 @@ public class UdpVectorClient {
         }
         
         // TODO: Increment the vector clock for the client's process
+              vcl.tick(id);
+
         // The clock should NOT tick if the message to send is "history" (for Task 2.2)
         
         // TODO: Prepare the message with the updated vector clock and client ID and send it to the server
-        String responseMessage = "message:timestamp:id";
-        System.out.println("Sent message: " + responseMessage);
+
+          String responseMessage = messageBody + ":" + vcl.showClock() + ":" + id;
+          sendData = responseMessage.getBytes();
+          DatagramPacket responsePacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
+          clientSocket.send(responsePacket);
+
+
+
+          System.out.println("Sent message: " + responseMessage);
         System.out.println("Current clock: " + vcl.showClock());
       }
     }

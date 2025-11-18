@@ -13,10 +13,12 @@ public class VectorClock {
 
   public synchronized void setVectorClock(int processId, int time) {
     // TODO: Set the vector clock value for the processId
+      timestamps[processId] = time;
   }
 
   public synchronized void tick(int processId) {
     // TODO: Increment the vector clock value for the processId
+      timestamps[processId-1] += 1;
   }
 
   public synchronized int getCurrentTimestamp(int processId) {
@@ -25,6 +27,9 @@ public class VectorClock {
 
   public synchronized void updateClock(VectorClock other) {
     // TODO: Update the vector clock based on the values of another vector clock
+      for (int i = 0; i < timestamps.length; i++) {
+          timestamps[i] = Math.max(timestamps[i], other.timestamps[i]);
+      }
   }
 
   public synchronized String showClock() {
