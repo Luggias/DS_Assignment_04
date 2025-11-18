@@ -49,7 +49,9 @@ public class VectorClientThread implements Runnable {
           }
 
           Message message = new Message(messageBody, receivedClock, senderID);
-          displayMessage(message);
+          if (vcl.checkAcceptMessage(senderID, receivedClock)) {
+              displayMessage(message);
+          }
 
       } catch (IOException e) {
           break;
