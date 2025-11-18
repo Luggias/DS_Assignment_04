@@ -1,13 +1,16 @@
-Assignment 4
-------------
+# Assignment 4
 
-# Team Members
+## Team Members
+ - Amelia Gasser
+ - Lukas Kapferer
+ - Paul Kottmann
 
-# GitHub link to your (forked) repository (if submitting through GitHub)
+## GitHub link to your (forked) repository (if submitting through GitHub)
+ - https://github.com/Luggias/DS_Assignment_04.git
 
 ...
 
-# Task 2
+### Task 2
 
 1. Why did message D have to be buffered and can we now always guarantee that all clients
    display the same message order?
@@ -15,7 +18,7 @@ Assignment 4
 2. Note that the chat application uses UDP. What could be an issue with this design choice—and
    how would you fix it?
    
-# Task 3
+### Task 3
 
 1. What is potential causality in Distributed Systems, and how can you model it? Why
    “potential causality” and not just “causality”?

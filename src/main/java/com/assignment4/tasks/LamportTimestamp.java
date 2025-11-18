@@ -17,6 +17,7 @@ public class LamportTimestamp {
     public synchronized void updateClock(int receivedTimestamp){
         // TODO: update the function to choose the higher value out of the two received timestamps
         if (timestamp < receivedTimestamp) { timestamp = receivedTimestamp; }
+        tick();
     }
 
 }

@@ -21,10 +21,30 @@ public class LTClientThread implements Runnable {
     // TODO:
     // Write your code here to continuously listen for incoming messages from the server and display them.
     // Make use of the Datagram sockets and functions in Java https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html
-    System.out.println("Client 3: Hello World!:1");
+    while (clientSocket.isConnected()) {
+      try {
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(receivePacket);
 
-    // TODO:
-    // Update the clock based on the timestamp received from the server.
-    System.out.println("Current clock: 2");
+        String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+        String[] partitions = receivedMessage.split(":");
+
+        String message = partitions[0];
+        int receivedTimestamp = Integer.parseInt(partitions[1]);
+        int senderID = Integer.parseInt(partitions[2]);
+
+        lc.updateClock(receivedTimestamp);
+        System.out.println("Client 3:" + receivedMessage + ":" + senderID);
+
+        // TODO:
+        // Update the clock based on the timestamp received from the server.
+        System.out.println("Current clock:" + lc.getCurrentTimestamp());
+
+      } catch (IOException e) {
+        break;
+      }
+    }
+
+
   }
 }
