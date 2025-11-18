@@ -22,7 +22,7 @@ Independent messages can still appear in different orders on different clients, 
 2. Note that the chat application uses UDP. What could be an issue with this design choice—and
    how would you fix it?
 Using UDP can cause problems because UDP does not guarantee delivery or ordering. Messages can get lost or arrive out of order, which would break delivery if an important message never arrives.
-A better solution would be to switch to TCP.
+A better solution would be to switch to TCP. 
    
 ### Task 3
 
