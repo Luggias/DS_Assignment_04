@@ -28,6 +28,7 @@ A better solution would be to switch to TCP.
 
 1. What is potential causality in Distributed Systems, and how can you model it? Why
    “potential causality” and not just “causality”?
+   Because every computer has his own local clock. Thus, if Computer A now made an event at 00.00 and Comper B made an event at 00.01, it’s still possible that b’s event happened before. 
 >
 
 2. If you look at your implementation of Task 2.1, can you think of one limitation of Vector Clocks? How would you overcome the limitation?
