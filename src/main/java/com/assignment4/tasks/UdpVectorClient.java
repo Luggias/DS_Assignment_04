@@ -29,20 +29,24 @@ public class UdpVectorClient {
 
     // TODO: This should not be counted as a message event, so the clock should not tick
 
-      String joinMessage = "joinMessage:" + vcl.getCurrentTimestamp(id) + ":" + id;
+      String joinMessage = "User "+ id +" has connected" + ":" + vcl.showClock() + ":" + id;
 
-    //TODO: Send an initial "join" message to notify the other clients that a new one has connected
+
+      //TODO: Send an initial "join" message to notify the other clients that a new one has connected
       byte [] sendData = joinMessage.getBytes();
+
 
    // TODO: Send the packet to the server
       DatagramPacket joinPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
       clientSocket.send(joinPacket);
 
-    // Prompt the user to start entering messages
+
+
+      // Prompt the user to start entering messages
     System.out.println("[" + id + "] Enter any message:");
     Scanner input = new Scanner(System.in);
 
-    while (clientSocket.isConnected()) {
+    while (true) {
       String messageBody = input.nextLine(); // Read user input
 
       if (!messageBody.isEmpty()) {
@@ -54,11 +58,12 @@ public class UdpVectorClient {
         }
         
         // TODO: Increment the vector clock for the client's process
-          if (!messageBody.equalsIgnoreCase("history")) {
-              vcl.tick(id);
-          }
+
 
         // The clock should NOT tick if the message to send is "history" (for Task 2.2)
+          if (!messageBody.equalsIgnoreCase("history")) {
+              vcl.tick(id-1);
+          }
         
         // TODO: Prepare the message with the updated vector clock and client ID and send it to the server
 

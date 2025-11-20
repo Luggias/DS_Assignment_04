@@ -18,7 +18,7 @@ public class VectorClock {
 
   public synchronized void tick(int processId) {
     // TODO: Increment the vector clock value for the processId
-      timestamps[processId-1] += 1;
+      timestamps[processId] += 1;
   }
 
   public synchronized int getCurrentTimestamp(int processId) {
@@ -40,10 +40,22 @@ public class VectorClock {
   // For Task 2.2
   // Check if a message can be delivered or has to be buffered
   public synchronized boolean checkAcceptMessage(int senderId, VectorClock senderClock) {
-    if( timestamps[senderId]+1== senderClock.timestamps[senderId]) {
-        return true;
-    }
-    return false;
 
+      int local = this.timestamps[senderId];
+      int msg = senderClock.timestamps[senderId];
+
+      if (local+1 != msg) {
+          return false;
+      }
+
+      // Für alle anderen Indizes gilt: msgClock[k] ≤ localClock[k]
+      for (int i = 0; i < timestamps.length; i++) {
+          if (i != (senderId )&& senderClock.timestamps[i] > this.timestamps[i]) {
+              return false;
+          }
+      }
+
+      return true;
   }
+
 }
