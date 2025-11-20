@@ -3,6 +3,7 @@ package com.assignment4.tasks;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.TreeMap;
 
 // This Class handles the continuous listening for incoming messages from the server
 public class LTClientThread implements Runnable {
@@ -21,9 +22,10 @@ public class LTClientThread implements Runnable {
     // TODO:
     // Write your code here to continuously listen for incoming messages from the server and display them.
     // Make use of the Datagram sockets and functions in Java https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html
-    while (clientSocket.isConnected()) {
-      try {
+    while (true) {
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+      try {
+
         clientSocket.receive(receivePacket);
 
         String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
@@ -34,7 +36,7 @@ public class LTClientThread implements Runnable {
         int senderID = Integer.parseInt(partitions[2]);
 
         lc.updateClock(receivedTimestamp);
-        System.out.println("Client 3:" + receivedMessage + ":" + senderID);
+        System.out.println("Client"+ senderID +  ":" + message + ":" + receivedTimestamp);
 
         // TODO:
         // Update the clock based on the timestamp received from the server.

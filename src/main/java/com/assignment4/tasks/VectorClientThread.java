@@ -35,13 +35,14 @@ public class VectorClientThread implements Runnable {
           clientSocket.receive(receivePacket);
 
           String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+
           String[] partitions = receivedMessage.split(":");
 
           String messageBody = partitions[0];
-          String clockString = partitions[1]; // Z.B.: "[1, 0, 0, 0]"
+          String clockString = partitions[1];
           int senderID = Integer.parseInt(partitions[2]);
 
-          String[] timestampsStr = clockString.replaceAll("[\\[\\]\\s]", "").split(","); // Entferne Klammern und Leerzeichen und splitte bei Komma
+          String[] timestampsStr = clockString.replaceAll("[\\[\\]\\s]", "").split(",");
           VectorClock receivedClock = new VectorClock(timestampsStr.length);
 
           for (int i = 0; i < timestampsStr.length; i++) {
@@ -49,7 +50,7 @@ public class VectorClientThread implements Runnable {
           }
 
           Message message = new Message(messageBody, receivedClock, senderID);
-          if (vcl.checkAcceptMessage(senderID, receivedClock)) {
+          if (vcl.checkAcceptMessage(senderID-1, receivedClock)) {
               displayMessage(message);
               checkBuffer();
           } else{buffer.add(message);}
@@ -66,24 +67,18 @@ public class VectorClientThread implements Runnable {
     the vector clock without ticking on receive. Then it should display the the updated vector clock.
     Example: Initial clock [0,0,0], updated clock after message from Client 1: [1, 0, 0]
 */
-  private void displayMessage(Message message) {
-      if (message == null) {
-          return;
-      }
+private void displayMessage(Message message) {
+    if (message == null) return;
 
-      String initialClock = vcl.showClock();
-      vcl.updateClock(message.getClock());
-      System.out.println("Current clock: " + vcl.showClock());
+    System.out.println("Client " + message.getSenderID() +
+                    ": " + message.getMessage() +
+                    ":" + message.getClock().showClock());
 
-  }
-    private void deliver(Message message) {
-        System.out.println("Client " + message.getSenderID() + ": " +
-                message.getMessage() + ": " + message.getClock().showClock());
+    vcl.updateClock(message.getClock());
 
-        vcl.updateClock(message.getClock());
+    System.out.println("Current clock: " + vcl.showClock());
+}
 
-        System.out.println("Current clock: " + vcl.showClock());
-    }
 
 
     private void checkBuffer() {
@@ -95,8 +90,8 @@ public class VectorClientThread implements Runnable {
             List<Message> delivered = new ArrayList<>();
 
             for (Message m : buffer) {
-                if (vcl.checkAcceptMessage(m.getSenderID(), m.getClock())) {
-                    deliver(m);
+                if (vcl.checkAcceptMessage(m.getSenderID() - 1, m.getClock())) {
+                    displayMessage(m);
                     delivered.add(m);
                     deliveredSomething = true;
                 }
@@ -105,5 +100,6 @@ public class VectorClientThread implements Runnable {
             buffer.removeAll(delivered);
         }
     }
+
 
 }
