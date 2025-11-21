@@ -22,84 +22,76 @@ public class VectorClientThread implements Runnable {
 
   @Override
   public void run() {
-
   // TODO:
   /*
       Write your code here to continuously listen for incoming messages from the server
       You should first process the received message and then update the vector clock based on the received message (you can use .replaceAll("[\\[\\]]", "").split(",\\s*"); to split a received vector clock into its components)
       Then display the received message and its vector clock
   */
-  while (true) {
-      try {
-          DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-          clientSocket.receive(receivePacket);
+      while (!clientSocket.isClosed()) {
+          try {
+              DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+              clientSocket.receive(receivePacket);
 
-          String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+              String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+              String[] partitions = receivedMessage.split(":");
 
-          String[] partitions = receivedMessage.split(":");
+              String messageBody = partitions[0];
+              String clockString = partitions[1];
+              int senderID = Integer.parseInt(partitions[2]);
 
-          String messageBody = partitions[0];
-          String clockString = partitions[1];
-          int senderID = Integer.parseInt(partitions[2]);
+              String[] timestampsStr = clockString.replaceAll("[\\[\\]\\s]", "").split(",");
+              VectorClock receivedClock = new VectorClock(timestampsStr.length);
 
-          String[] timestampsStr = clockString.replaceAll("[\\[\\]\\s]", "").split(",");
-          VectorClock receivedClock = new VectorClock(timestampsStr.length);
+              for (int i = 0; i < timestampsStr.length; i++) {
+                  receivedClock.setVectorClock(i, Integer.parseInt(timestampsStr[i]));
+              }
 
-          for (int i = 0; i < timestampsStr.length; i++) {
-              receivedClock.setVectorClock(i, Integer.parseInt(timestampsStr[i]));
+              Message message = new Message(messageBody, receivedClock, senderID);
+              if (vcl.checkAcceptMessage(senderID-1, receivedClock)) {
+                  displayMessage(message);
+                  checkBuffer();
+              } else {buffer.add(message); }
+
+          } catch (IOException e) {
+              break;
           }
-
-          Message message = new Message(messageBody, receivedClock, senderID);
-          if (vcl.checkAcceptMessage(senderID-1, receivedClock)) {
-              displayMessage(message);
-              checkBuffer();
-          } else{buffer.add(message);}
-
-      } catch (IOException e) {
-          break;
       }
   }
-  }
 
-// TODO:
-/*
+  // TODO:
+  /*
     This method should print out the message (e.g. Client 1: Hello World!: [1, 0, 0]) and update
     the vector clock without ticking on receive. Then it should display the the updated vector clock.
     Example: Initial clock [0,0,0], updated clock after message from Client 1: [1, 0, 0]
-*/
-private void displayMessage(Message message) {
-    if (message == null) return;
+  */
+  private void displayMessage(Message message) {
+      if (message == null) return;
 
-    System.out.println("Client " + message.getSenderID() +
-                    ": " + message.getMessage() +
-                    ":" + message.getClock().showClock());
+      System.out.println("Client " + message.getSenderID() +
+              ": " + message.getMessage() +
+              ": " + message.getClock().showClock());
+      vcl.updateClock(message.getClock());
 
-    vcl.updateClock(message.getClock());
+      System.out.println("Current clock: " + vcl.showClock());
+  }
 
-    System.out.println("Current clock: " + vcl.showClock());
-}
+  private void checkBuffer() {
+      boolean deliveredSomething = true;
 
+      while (deliveredSomething) {
+          deliveredSomething = false;
 
+          List<Message> delivered = new ArrayList<>();
 
-    private void checkBuffer() {
-        boolean deliveredSomething = true;
-
-        while (deliveredSomething) {
-            deliveredSomething = false;
-
-            List<Message> delivered = new ArrayList<>();
-
-            for (Message m : buffer) {
-                if (vcl.checkAcceptMessage(m.getSenderID() - 1, m.getClock())) {
-                    displayMessage(m);
-                    delivered.add(m);
-                    deliveredSomething = true;
-                }
-            }
-
-            buffer.removeAll(delivered);
-        }
-    }
-
-
+          for (Message m : buffer) {
+              if (vcl.checkAcceptMessage(m.getSenderID() - 1, m.getClock())) {
+                  displayMessage(m);
+                  delivered.add(m);
+                  deliveredSomething = true;
+              }
+          }
+          buffer.removeAll(delivered);
+      }
+  }
 }

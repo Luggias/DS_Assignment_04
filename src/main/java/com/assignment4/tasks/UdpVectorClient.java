@@ -28,18 +28,16 @@ public class UdpVectorClient {
     receiverThread.start();
 
     // TODO: This should not be counted as a message event, so the clock should not tick
-
-      String joinMessage = "User "+ id +" has connected" + ":" + vcl.showClock() + ":" + id;
-
-
-      //TODO: Send an initial "join" message to notify the other clients that a new one has connected
-      byte [] sendData = joinMessage.getBytes();
+    String joinMessage = "User "+ id +" has connected" + ":" + vcl.showClock() + ":" + id;
 
 
-   // TODO: Send the packet to the server
-      DatagramPacket joinPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
-      clientSocket.send(joinPacket);
+    //TODO: Send an initial "join" message to notify the other clients that a new one has connected
+    byte [] sendData = joinMessage.getBytes();
 
+
+    // TODO: Send the packet to the server
+    DatagramPacket joinPacket = new DatagramPacket(sendData, sendData.length, ipAddress, port);
+    clientSocket.send(joinPacket);
 
 
       // Prompt the user to start entering messages

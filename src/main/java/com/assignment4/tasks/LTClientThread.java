@@ -22,10 +22,9 @@ public class LTClientThread implements Runnable {
     // TODO:
     // Write your code here to continuously listen for incoming messages from the server and display them.
     // Make use of the Datagram sockets and functions in Java https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html
-    while (true) {
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+    while (clientSocket.isConnected()) {
       try {
-
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
 
         String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();

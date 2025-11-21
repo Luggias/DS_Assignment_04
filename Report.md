@@ -42,11 +42,11 @@ A better solution would be to switch to TCP.
    This already showcases a limitation of Lamport Clocks, they cannot detect concurrency (||). So they can preserve causality but cannot fully model it.
    By using **Vector Clocks** we can model potential causality more precisely. When using vector clocks each process keeps a vector (with size n = #(clocks)) of counters for each process. 
    Therefore, vector clocks can detect causality and concurrency.
-   
->
+
+
 
 2. If you look at your implementation of Task 2.1, can you think of one limitation of Vector Clocks? How would you overcome the limitation?
->
+> 
 
 3. Figure 4 shows an example of enforcing causal communication using Vector Clocks. You can find a detailed explanation of this example and the broadcast algorithm being used in
    the Distributed Systems book by van Steen and Tannenbaum (see Chapter 5.2.2, page 270). Would you achieve the same result if you used the same broadcast algorithm but replaced
