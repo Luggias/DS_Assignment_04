@@ -28,14 +28,15 @@ public class VectorClientThread implements Runnable {
       You should first process the received message and then update the vector clock based on the received message (you can use .replaceAll("[\\[\\]]", "").split(",\\s*"); to split a received vector clock into its components)
       Then display the received message and its vector clock
   */
-      while (!clientSocket.isClosed()) {
+      while (true) {
           try {
               DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
               clientSocket.receive(receivePacket);
 
               String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
-              String[] partitions = receivedMessage.split(":");
+              if (receivedMessage.isEmpty()) continue;
 
+              String[] partitions = receivedMessage.split(":");
               String messageBody = partitions[0];
               String clockString = partitions[1];
               int senderID = Integer.parseInt(partitions[2]);
@@ -48,7 +49,13 @@ public class VectorClientThread implements Runnable {
               }
 
               Message message = new Message(messageBody, receivedClock, senderID);
-              if (vcl.checkAcceptMessage(senderID-1, receivedClock)) {
+
+              if (messageBody.startsWith("User") && messageBody.contains("has connected")) {
+                  displayMessage(message);
+                  continue;
+              }
+
+              if (vcl.checkAcceptMessage(senderID, receivedClock)) {
                   displayMessage(message);
                   checkBuffer();
               } else {buffer.add(message); }
@@ -85,7 +92,7 @@ public class VectorClientThread implements Runnable {
           List<Message> delivered = new ArrayList<>();
 
           for (Message m : buffer) {
-              if (vcl.checkAcceptMessage(m.getSenderID() - 1, m.getClock())) {
+              if (vcl.checkAcceptMessage(m.getSenderID() , m.getClock())) {
                   displayMessage(m);
                   delivered.add(m);
                   deliveredSomething = true;
