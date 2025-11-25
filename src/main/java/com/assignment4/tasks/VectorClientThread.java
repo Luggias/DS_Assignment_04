@@ -58,7 +58,9 @@ public class VectorClientThread implements Runnable {
               if (vcl.checkAcceptMessage(senderID, receivedClock)) {
                   displayMessage(message);
                   checkBuffer();
-              } else {buffer.add(message); }
+              } else {
+                  System.out.println("Buffered message from Client " + senderID + " with " + receivedClock.showClock());
+                  buffer.add(message); }
 
           } catch (IOException e) {
               break;
